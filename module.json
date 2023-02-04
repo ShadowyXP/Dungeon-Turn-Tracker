@@ -1,8 +1,8 @@
 {
-  "id": "module",
-  "title": "New Module",
-  "description": "",
-  "version": "#{VERSION}#",
+  "id": "dungeon-turn-tracker",
+  "title": "Dungeon Turn Tracker",
+  "description": "A module that helps track dungeon turns.",
+  "version": "1",
   "library": "false",
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
@@ -12,9 +12,7 @@
   },
   "authors": [
     {
-      "name": "The League of Extraordinary FVTT Developers",
-      "url": "https://github.com/League-of-Foundry-Developers",
-      "discord": "discordID#0001"
+      "name": "Max Schreifels"
     }
   ],
   "relationships": {
