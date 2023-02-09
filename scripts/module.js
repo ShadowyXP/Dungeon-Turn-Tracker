@@ -1,4 +1,26 @@
+class DungeonTurnConfig extends FormApplication {
+    static get defaultOptions() {
+        const defaults = super.defaultOptions;
 
+        const overrides = {
+            height: 'auto',
+            id: 'dungeon-turn-tracker',
+            template: DungeonActor.TEMPLATES.DUNGEONTURNLIST,
+            title: 'Dungeon Turn Tracker',
+            userId: game.userId,
+        };
+
+        const mergedOptions = foundry.utils.mergeObject(defaults, overrides);
+
+        return mergedOptions;
+    }
+
+    getData(options) {
+        return {
+            dungeonTurns: DungeonActorData.getDungeonActorsForUser(options.userId)
+        }
+    }
+}
 
 /**
  * A single Dungeon Actor
@@ -15,7 +37,7 @@ class DungeonActor {
     }
 
     static TEMPLATES = {
-        DUNGEONTURNLIST: `modules/${this.ID}/templates/module.hbs`
+        DUNGEONTURNLIST: `modules/${this.ID}/templates/dungeon_turn_tracker.hbs`
     }
 
     static log(force, ...args){
@@ -24,6 +46,10 @@ class DungeonActor {
         if (shouldLog) {
             console.log(this.ID, '|', ...args);
         }
+    }
+
+    static initialize(){
+        this.dungeonActorConfig = new DungeonTurnConfig();
     }
 }
 
@@ -84,13 +110,14 @@ class DungeonActorData {
         return game.users.get(relevantDungeonActor.userId)?.setFlag(DungeonActor.ID, DungeonActor.FLAGS.DUNGEONACTORS, keyDeletion);
     }
 
+    //Update dungeon actors for a user.
     static updateUserDungeonActors(userId, updateData){
         return game.users.get(userId)?.setFlag(DungeonActor.ID, DungeonActor.FLAGS.DUNGEONACTORS, updateData);
     }
 }
 
 Hooks.once('init', async function() {
-
+    DungeonActor.initialize();
 });
 
 Hooks.once('ready', async function() {
@@ -99,13 +126,22 @@ Hooks.once('ready', async function() {
 
 Hooks.once('devModeReady', ({registerPackageDebugFlag}) => {
     registerPackageDebugFlag(DungeonActor.ID);
-})
+});
 
 Hooks.on("renderCombatTracker", (app,html,data) => {
 
+    //Locate the area we want to have the encounter tracker button (at the top of the combat tracker tab.)
+    //no space between the css classes to show that we want both, it sounds like having a space between them is an "OR" instead of and.
     const buttonLocation = html.find(".encounters.flexrow");
 
+    //Make it so that the hovered tooltip is localized to the correct language.
     const tooltip = game.i18n.localize('DUNGEON-TURN-TRACKER.open-tracker-button');
 
-    buttonLocation.append(`<a class='combat-button combat-control' title='${tooltip}'><i class='fas fa-archway'></i></a>`);
+    //Make the button, I just copied the format of the other combat tracker control buttons, keeping the same css classes let them have the same formatting! "NEAT!"
+    buttonLocation.append(`<a class='combat-button combat-control dungeon-tracker-icon-button' title='${tooltip}'><i class='fas fa-archway'></i></a>`);
+
+    //Create a listener for when the button is clicked, it doesnt do anything yet, but it will soon.
+    html.on('click', '.dungeon-tracker-icon-button', (event) => {
+        DungeonActor.dungeonActorConfig.render(true);
+    })
 });
