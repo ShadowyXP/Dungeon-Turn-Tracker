@@ -1,11 +1,35 @@
 <form>
+    {{! This will have a bunch of buttons that control dungeon turns "Next Turn", etc.}}
     <header class="dungeon-turn-tracker-header">
         <i>I have a bunch of buttons that control everything</i>
     </header>
     <div class="flexrow">
         <div>
-            <i>I am where the dungeon actors go</i>
+            <ul class="todo-list flexcol">
+
+                {{! These are the labels for the different fields. May be less necessary when I have tooltips sorted out}}
+                <li class="flexrow">
+                    <p class="flex3">Turn Text</p>
+                    <p class="flex0">Frequency</p>
+                </li>
+
+                {{! This will loop through all of our dungeon turns and let the user update the dungeon turns how they like.}}
+                {{! I was super confused how to know what I'm looping through, but in the DungeonTurnConfig class, there is a getData method that forwards certain data to the template.}}
+                {{#each dungeonTurns}}
+                <li class="flexrow" data-todo-id="{{id}}">
+
+                <input class="flex3" type="text" value="{{label}}" name="{{id}}.label" data-dtype="String" />
+
+                <input class="flex0" type="text" value="{{frequency}}" name="{{id}}.frequency" data-dtype="String" />
+
+                <button type="button" title="Delete To Do" data-action="delete" class="flex0 todo-list-icon-button">
+                    <i class="fas fa-trash"></i>
+                </button>
+                </li>
+                {{/each}}
+            </ul>
         </div>
+        {{! This will be the window that the GM sees the next dungeon turns, super useful!}}
         <ol id="dungeon-turns">
             <i class="flexrow">I'm a dungeon actor that displays during the turn!</i>
             <i class="flexrow">Me too!</i>
